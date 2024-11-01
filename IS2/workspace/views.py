@@ -59,3 +59,18 @@ def obtener_workspaces_por_usuario(request, cod_usuario):
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+@csrf_exempt
+def eliminar_workspace(request, cod_espacio):
+    if request.method == 'DELETE':
+        try:
+            # obtener el workspace por su código
+            workspace_obj = workspace.objects.get(cod_espacio=cod_espacio)
+            workspace_obj.delete()  # Eliminar el workspace
+            return JsonResponse({'mensaje': 'Workspace eliminado correctamente'}, status=204)
+        except workspace.DoesNotExist:
+            return JsonResponse({'error': 'Workspace no encontrado'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
