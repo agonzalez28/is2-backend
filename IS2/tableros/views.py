@@ -63,10 +63,9 @@ def obtener_tableros_por_workspace(request, cod_espacio):
             print(f"Consulta para cod_espacio: {cod_espacio}")
             tableros_list = tableros.objects.filter(cod_espacio__cod_espacio=cod_espacio).values()
 
-            if not tableros_list:
-                return JsonResponse({'error': 'No se encontraron tableros para este workspace'}, status=404)
-
+             # Retorna una lista vacía si no hay resultados
             return JsonResponse(list(tableros_list), safe=False, status=200)
+
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
