@@ -64,3 +64,14 @@ def login_usuario(request):
 
 def home(request):
     return HttpResponse("¡Bienvenido a la aplicación de gestión de tareas!")
+
+@csrf_exempt
+def obtener_usuarios(request):
+    if request.method == 'GET':
+        try:
+            usuarios_list = usuario.objects.values('cod_usuario', 'nom_usuario')  # Solo devuelve el código y el nombre
+            return JsonResponse(list(usuarios_list), safe=False, status=200)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Método no permitido'}, status=405)

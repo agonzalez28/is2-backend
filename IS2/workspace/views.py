@@ -18,7 +18,8 @@ def crear_workspace(request):
             descripcion = data.get('descripcion')
             estado = data.get('estado', 'Publico')  # Valor por defecto: 'Publico'
             cod_usuario = data.get('cod_usuario')
-        
+            cod_usuarios = data.get('cod_usuarios', [])  # Lista de códigos de usuarios a agregar
+
             print(f"Nombre del proyecto: {nom_proyecto}, Descripción: {descripcion}, Estado: {estado}, Código de usuario: {cod_usuario}") 
             
             # Validaciones básicas
@@ -38,8 +39,24 @@ def crear_workspace(request):
                 usu_modificacion=usuario_obj.nom_usuario  # Se guarda el nombre del usuario modificador
             )
 
-            return JsonResponse({'mensaje': 'Workspace creado correctamente', 'cod_espacio': nuevo_workspace.cod_espacio}, status=201)
-        
+            # Agregar los usuarios al workspace
+            usuarios_agregados = []  # Lista para almacenar los usuarios agregados
+            for cod_user in cod_usuarios:
+                try:
+                    user_obj = usuario.objects.get(cod_usuario=cod_user)
+                    nuevo_workspace.usuarios.add(user_obj)  # Agregar usuario al workspace
+                    usuarios_agregados.append(user_obj.nom_usuario)  # Añadir el nombre del usuario a la lista
+                except usuario.DoesNotExist:
+                    print(f"Usuario con código {cod_user} no encontrado y no se agregará.")
+
+            return JsonResponse({
+                'mensaje': 'Workspace creado correctamente', 'cod_espacio': nuevo_workspace.cod_espacio,
+                'nom_proyecto': nuevo_workspace.nom_proyecto,
+                'descripcion': nuevo_workspace.descripcion,
+                'estado': nuevo_workspace.estado,
+                'usuarios': usuarios_agregados 
+                }, status=201)
+                
         except usuario.DoesNotExist:
             return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
         except json.JSONDecodeError:

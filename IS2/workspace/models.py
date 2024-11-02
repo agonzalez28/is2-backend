@@ -11,6 +11,7 @@ class workspace(models.Model):
     fec_creacion = models.DateField(default=date.today)
     usu_modificacion = models.CharField(max_length=255)
     fec_modificacion = models.DateField(auto_now=True)
+    usuarios = models.ManyToManyField(usuario, related_name='workspaces', blank=True) #Relacion para usuarios asignados en el workspace
 
     class Meta:
         db_table = 'espacios'
