@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'workspace',
     'tableros',
+    'lista_tableros',
 ]
 
 MIDDLEWARE = [

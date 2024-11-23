@@ -13,3 +13,4 @@ class tableros(models.Model):
 
     class Meta:
         db_table = 'tableros'
+
