@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'workspace',
     'tableros',
     'lista_tableros',
+    'tarjeta',
 ]
 
 MIDDLEWARE = [

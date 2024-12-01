@@ -24,6 +24,7 @@ urlpatterns = [
     path('api/', include('usuarios.urls')), 
     path('api/workspace/', include('workspace.urls')),
     path('api/tableros/', include('tableros.urls')),
-    path('api/tableros/listas/', include('lista_tableros.urls')),  
+    path('api/tableros/listas/', include('lista_tableros.urls')),
+    path('api/tableros/listas/tarjetas/', include('tarjeta.urls'))  
 ]
     
