@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Tarjeta
 from lista_tableros.models import ListaTableros
+from datetime import date
+
 import json
 
 @csrf_exempt
@@ -37,7 +39,8 @@ def crear_tarjeta(request):
                 estado=estado,
                 usu_encargado=usu_encargado,
                 fec_vencimiento=fec_vencimiento,
-                cod_lista=lista_obj
+                cod_lista=lista_obj, 
+                fec_creacion= date.today()
             )
 
             # Responder con los datos de la nueva tarjeta
@@ -70,12 +73,14 @@ def actualizar_tarjeta(request, cod_tarjeta):
                 return JsonResponse({"error": "Tarjeta no encontrada"}, status=404)
 
             # Obtener solo los campos a actualizar
-            nom_tarjeta = data.get("nom_tarjeta", tarjeta_obj.nom_tarjeta)  # Si no se pasa, se mantiene el valor actual
+            nom_tarjeta = data.get("nom_tarjeta", tarjeta_obj.nom_tarjeta) 
             descripcion = data.get("descripcion", tarjeta_obj.descripcion)
+            fec_vencimiento = data.get("fec_vencimiento", tarjeta_obj.fec_vencimiento)
 
             # Actualizar solo los campos permitidos
             tarjeta_obj.nom_tarjeta = nom_tarjeta
             tarjeta_obj.descripcion = descripcion
+            tarjeta_obj.fec_vencimiento = fec_vencimiento
 
             tarjeta_obj.save()
 
@@ -85,6 +90,7 @@ def actualizar_tarjeta(request, cod_tarjeta):
                 "cod_tarjeta": tarjeta_obj.cod_tarjeta,
                 "nom_tarjeta": tarjeta_obj.nom_tarjeta,
                 "descripcion": tarjeta_obj.descripcion,
+                "fec_vencimiento": tarjeta_obj.fec_vencimiento
             }, status=200)
 
         except json.JSONDecodeError:

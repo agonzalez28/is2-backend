@@ -9,6 +9,7 @@ class Tarjeta(models.Model):
     usu_encargado = models.CharField(max_length=10, null=True, blank=True)
     fec_vencimiento = models.DateField(null=True, blank=True)
     cod_lista = models.ForeignKey(ListaTableros, on_delete=models.CASCADE,  db_column='cod_lista') #Relacion para tarjetas con listas
-
+    fec_creacion = models.DateField(auto_now_add=True)
+      
     class Meta:
         db_table = 'tarjetas'
