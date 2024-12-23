@@ -1,0 +1,135 @@
+
+CREATE TABLE public.usuarios (
+                cod_usuario INTEGER NOT NULL,
+                nom_usuario VARCHAR NOT NULL,
+                dir_correo VARCHAR NOT NULL,
+                pass_usuario VARCHAR NOT NULL,
+                CONSTRAINT cod_usuario PRIMARY KEY (cod_usuario)
+);
+
+
+CREATE TABLE public.espacios (
+                cod_espacio INTEGER NOT NULL,
+                nom_proyecto VARCHAR NOT NULL,
+                descripcion VARCHAR NOT NULL,
+                estado VARCHAR NOT NULL,
+                usu_creador INTEGER NOT NULL,
+                fec_creacion DATE NOT NULL,
+                usu_modificacion VARCHAR NOT NULL,
+                fec_modificacion DATE NOT NULL,
+                CONSTRAINT cod_espacio PRIMARY KEY (cod_espacio)
+);
+COMMENT ON TABLE public.espacios IS 'Espacio de Trabajos';
+
+
+CREATE TABLE public.tableros (
+                cod_tablero INTEGER NOT NULL,
+                cod_espacio INTEGER NOT NULL,
+                nom_tablero VARCHAR(50) NOT NULL,
+                descripcion VARCHAR(200) NOT NULL,
+                usu_creador VARCHAR(10) NOT NULL,
+                fec_creacion DATE NOT NULL,
+                CONSTRAINT cod_tablero PRIMARY KEY (cod_tablero)
+);
+
+
+CREATE TABLE public.listas_tableros (
+                cod_lista INTEGER NOT NULL,
+                nom_lista VARCHAR(25) NOT NULL,
+                cant_tarjetas INTEGER DEFAULT 1 NOT NULL,
+                cod_tablero INTEGER NOT NULL,
+                CONSTRAINT cod_lista PRIMARY KEY (cod_lista)
+);
+
+
+CREATE TABLE public.tarjetas (
+                cod_tarjeta INTEGER NOT NULL,
+                nom_tarjeta VARCHAR(25) NOT NULL,
+                descripcion VARCHAR(200) NOT NULL,
+                estado VARCHAR(3) NOT NULL,
+                cod_usuario INTEGER NOT NULL,
+                usu_encargado VARCHAR(10),
+                fec_vencimiento DATE,
+                cod_lista INTEGER NOT NULL,
+                CONSTRAINT cod_tarjeta PRIMARY KEY (cod_tarjeta)
+);
+
+
+CREATE TABLE public.tareas (
+                cod_tarea INTEGER NOT NULL,
+                nom_tarea VARCHAR NOT NULL,
+                descripcion VARCHAR NOT NULL,
+                estado VARCHAR NOT NULL,
+                cod_tarjeta INTEGER NOT NULL,
+                fec_creacion DATE NOT NULL,
+                fec_vencimiento DATE NOT NULL,
+                CONSTRAINT cod_tarea PRIMARY KEY (cod_tarea)
+);
+
+
+CREATE TABLE public.comentarios (
+                cod_comentario INTEGER NOT NULL,
+                cod_tarjeta INTEGER NOT NULL,
+                mensaje VARCHAR NOT NULL,
+                cod_usuario VARCHAR NOT NULL,
+                fec_creacion VARCHAR NOT NULL,
+                cod_tarea INTEGER,
+                CONSTRAINT cod_comentario PRIMARY KEY (cod_comentario, cod_tarjeta)
+);
+
+
+ALTER TABLE public.espacios ADD CONSTRAINT usuarios_espacios_fk
+FOREIGN KEY (usu_creador)
+REFERENCES public.usuarios (cod_usuario)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.tarjetas ADD CONSTRAINT usuarios_tarjetas_fk
+FOREIGN KEY (cod_usuario)
+REFERENCES public.usuarios (cod_usuario)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.tableros ADD CONSTRAINT proyectos_tableros_fk
+FOREIGN KEY (cod_espacio)
+REFERENCES public.espacios (cod_espacio)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.listas_tableros ADD CONSTRAINT tableros_listas_tableros_fk
+FOREIGN KEY (cod_tablero)
+REFERENCES public.tableros (cod_tablero)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.tarjetas ADD CONSTRAINT listas_tableros_tarjetas_fk
+FOREIGN KEY (cod_lista)
+REFERENCES public.listas_tableros (cod_lista)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.tareas ADD CONSTRAINT tarjetas_tareas_fk
+FOREIGN KEY (cod_tarjeta)
+REFERENCES public.tarjetas (cod_tarjeta)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.comentarios ADD CONSTRAINT tarjetas_comentarios_fk
+FOREIGN KEY (cod_tarjeta)
+REFERENCES public.tarjetas (cod_tarjeta)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.comentarios ADD CONSTRAINT tareas_comentarios_fk
+FOREIGN KEY (cod_tarea)
+REFERENCES public.tareas (cod_tarea)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
