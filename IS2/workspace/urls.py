@@ -1,7 +1,7 @@
 # workspace/urls.py
 
 from django.urls import path
-from .views import crear_workspace, obtener_workspaces_por_usuario, eliminar_workspace
+from .views import crear_workspace, obtener_workspaces_por_usuario, eliminar_workspace, actualizar_workspace
 
 urlpatterns = [
     path('crear/', crear_workspace, name='crear_workspace'),
