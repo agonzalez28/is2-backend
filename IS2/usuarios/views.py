@@ -8,6 +8,12 @@ from django.http import HttpResponse
 from .models import usuario
 from django.contrib.auth.hashers import make_password, check_password
 
+from google.oauth2 import id_token
+from google.auth.transport import requests
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
 
 @csrf_exempt  # Solo para evitar problemas de CSRF en este ejemplo (mejor agregar CSRF Token en producción)
 def registro_usuario(request):
@@ -75,3 +81,30 @@ def obtener_usuarios(request):
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+class GoogleLoginView(APIView):
+    def post(self, request):
+        token = request.data.get('token')
+        if not token:
+            return Response({'error': 'Token requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Validar el token con Google
+            idinfo = id_token.verify_oauth2_token(token, requests.Request(), "803348551466-oboa8q0363scjbhe6rp16nakdo999mar.apps.googleusercontent.com")
+            email = idinfo.get('email')
+            name = idinfo.get('name')
+
+            # Busca o crea al usuario en la base de datos
+            user, created = User.objects.get_or_create(email=email, defaults={'username': name})
+
+            # Genera un JWT para el usuario
+            refresh = RefreshToken.for_user(user)
+
+            return Response({
+                'message': 'Login exitoso',
+                'authToken': str(refresh.access_token),  # Token de acceso
+                'refreshToken': str(refresh),  # Token de refresco
+                'user': {'email': user.email, 'name': user.username}
+            })
+        except ValueError as e:
+            return Response({'error': 'Token inválido'}, status=status.HTTP_401_UNAUTHORIZED)
