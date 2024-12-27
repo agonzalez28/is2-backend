@@ -4,6 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Tarjeta
 from lista_tableros.models import ListaTableros
 from datetime import date
+from django.db.models import Count, Value
+
 
 import json
 
@@ -177,3 +179,83 @@ def mover_tarjeta(request, cod_tarjeta):
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Método no permitido"}, status=405)
+
+@csrf_exempt
+def tarjetas_por_usuario(request, cod_tablero):
+    if request.method == "GET":
+        try:
+            # Filtrar tarjetas por el tablero específico
+            tarjetas_por_usuario = (
+                Tarjeta.objects.filter(cod_lista__cod_tablero=cod_tablero)
+                .values('usu_encargado')
+                .annotate(total=Count('cod_tarjeta'))
+                .order_by('-total')
+            )
+            return JsonResponse({"tarjetas_por_usuario": list(tarjetas_por_usuario)}, status=200)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+@csrf_exempt
+def tarjetas_por_estado(request, cod_tablero):
+    if request.method == "GET":
+        try:
+            # Filtrar tarjetas por el tablero específico
+            tarjetas_por_estado = (
+                Tarjeta.objects.filter(cod_lista__cod_tablero=cod_tablero)
+                .values('estado')
+                .annotate(total=Count('cod_tarjeta'))
+                .order_by('estado')
+            )
+            return JsonResponse({"tarjetas_por_estado": list(tarjetas_por_estado)}, status=200)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+
+@csrf_exempt
+def resumen_tarjetas(request):
+    if request.method == "GET":
+        try:
+            # Tarjetas por usuario
+            tarjetas_por_usuario = (
+                Tarjeta.objects.values('usu_encargado')
+                .annotate(total=Count('cod_tarjeta'))
+                .order_by('-total')
+            )
+
+            # Tarjetas por estado
+            tarjetas_por_estado = (
+                Tarjeta.objects.values('estado')
+                .annotate(total=Count('cod_tarjeta'))
+                .order_by('estado')
+            )
+
+            # Tarjetas atrasadas
+            hoy = date.today()
+            tarjetas_atrasadas = Tarjeta.objects.filter(fec_vencimiento__lt=hoy, estado='To Do').count()
+
+            return JsonResponse({
+                "tarjetas_por_usuario": list(tarjetas_por_usuario),
+                "tarjetas_por_estado": list(tarjetas_por_estado),
+                "tarjetas_atrasadas": tarjetas_atrasadas
+            }, status=200)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
+from datetime import date
+
+@csrf_exempt
+def tarjetas_atrasadas(request, cod_tablero):
+    if request.method == "GET":
+        try:
+            hoy = date.today()
+            # Filtrar tarjetas por tablero y fecha vencida
+            atrasadas = Tarjeta.objects.filter(
+                cod_lista__cod_tablero=cod_tablero,
+                fec_vencimiento__lt=hoy,
+                estado='E'
+            )
+            return JsonResponse({"tarjetas_atrasadas": atrasadas.count()}, status=200)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
