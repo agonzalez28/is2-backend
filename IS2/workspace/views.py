@@ -108,17 +108,20 @@ def actualizar_workspace(request, cod_espacio):
 
             # Validar que se ha enviado el nuevo nombre del proyecto
             nom_proyecto = data.get("nom_proyecto")
+            estado = data.get("estado")
             if not nom_proyecto:
                 return JsonResponse({"error": "El nombre del proyecto es obligatorio"}, status=400)
 
             # Actualizar campo de nombre del proyecto
             workspace_obj.nom_proyecto = nom_proyecto
+            workspace_obj.estado = estado
             workspace_obj.save()
 
             return JsonResponse({
                 "mensaje": "Workspace actualizado con exito",
                 "cod_espacio": workspace_obj.cod_espacio,
-                "nom_proyecto": workspace_obj.nom_proyecto
+                "nom_proyecto": workspace_obj.nom_proyecto,
+                "estado": workspace_obj.estado
             }, status=200)
 
         except json.JSONDecodeError:
