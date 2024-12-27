@@ -79,14 +79,16 @@ def actualizar_tarjeta(request, cod_tarjeta):
             # Obtener solo los campos a actualizar
             nom_tarjeta = data.get("nom_tarjeta", tarjeta_obj.nom_tarjeta) 
             descripcion = data.get("descripcion", tarjeta_obj.descripcion)
-            fec_vencimiento = data.get("fec_vencimiento", tarjeta_obj.fec_vencimiento)
             estado = data.get("estado", tarjeta_obj.estado)  # Si no se pasa, mantiene el estado actual
+            usu_encargado = data.get("usu_encargado", tarjeta_obj.usu_encargado)
+            fec_vencimiento = data.get("fec_vencimiento", tarjeta_obj.fec_vencimiento)
 
             # Actualizar solo los campos permitidos
             tarjeta_obj.nom_tarjeta = nom_tarjeta
             tarjeta_obj.descripcion = descripcion
             tarjeta_obj.fec_vencimiento = fec_vencimiento
             tarjeta_obj.estado = estado
+            tarjeta_obj.usu_encargado = usu_encargado
 
             tarjeta_obj.save()
 
@@ -98,6 +100,7 @@ def actualizar_tarjeta(request, cod_tarjeta):
                 "descripcion": tarjeta_obj.descripcion,
                 "fec_vencimiento": tarjeta_obj.fec_vencimiento,
                 "estado": tarjeta_obj.estado,
+                "usu_encargado": tarjeta_obj.usu_encargado,
             }, status=200)
 
         except json.JSONDecodeError:
@@ -128,6 +131,7 @@ def obtener_tarjetas(request, cod_lista):
                 "estado": tarjeta.estado,
                 "usu_encargado": tarjeta.usu_encargado,
                 "fec_vencimiento": tarjeta.fec_vencimiento,
+                "fec_creacion": tarjeta.fec_creacion,
             } for tarjeta in tarjetas]
 
             return JsonResponse({"tarjetas": tarjetas_data}, status=200)
