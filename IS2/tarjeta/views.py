@@ -17,7 +17,7 @@ def crear_tarjeta(request):
             
             nom_tarjeta = data.get("nom_tarjeta")
             descripcion = data.get("descripcion", "")  # Asignar una cadena vacía si no se pasa una descripción
-            estado = data.get("estado", "NEW")  # Estado por defecto
+            estado = data.get("estado", "P")  # Estado por defecto
             usu_encargado = data.get("usu_encargado", None)
             fec_vencimiento = data.get("fec_vencimiento", None)
             cod_lista = data.get("cod_lista")  # Se espera el cod_lista del cliente
@@ -80,11 +80,13 @@ def actualizar_tarjeta(request, cod_tarjeta):
             nom_tarjeta = data.get("nom_tarjeta", tarjeta_obj.nom_tarjeta) 
             descripcion = data.get("descripcion", tarjeta_obj.descripcion)
             fec_vencimiento = data.get("fec_vencimiento", tarjeta_obj.fec_vencimiento)
+            estado = data.get("estado", tarjeta_obj.estado)  # Si no se pasa, mantiene el estado actual
 
             # Actualizar solo los campos permitidos
             tarjeta_obj.nom_tarjeta = nom_tarjeta
             tarjeta_obj.descripcion = descripcion
             tarjeta_obj.fec_vencimiento = fec_vencimiento
+            tarjeta_obj.estado = estado
 
             tarjeta_obj.save()
 
@@ -94,7 +96,8 @@ def actualizar_tarjeta(request, cod_tarjeta):
                 "cod_tarjeta": tarjeta_obj.cod_tarjeta,
                 "nom_tarjeta": tarjeta_obj.nom_tarjeta,
                 "descripcion": tarjeta_obj.descripcion,
-                "fec_vencimiento": tarjeta_obj.fec_vencimiento
+                "fec_vencimiento": tarjeta_obj.fec_vencimiento,
+                "estado": tarjeta_obj.estado,
             }, status=200)
 
         except json.JSONDecodeError:

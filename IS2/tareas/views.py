@@ -40,7 +40,10 @@ def crear_tarea(request):
             return JsonResponse({
                 "mensaje": "Tarea creada exitosamente",
                 "cod_tarea": nueva_tarea.cod_tarea,
-                "cod_tarjeta": tarjeta_obj.cod_tarjeta
+                "cod_tarjeta": tarjeta_obj.cod_tarjeta,
+                "descripcion": nueva_tarea.descripcion,
+                "estado": nueva_tarea.estado,
+                "fec_vencimiento": nueva_tarea.fec_vencimiento
             }, status=201)
 
         except json.JSONDecodeError:
